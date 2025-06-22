@@ -5,12 +5,14 @@ import { compare, hash } from 'bcryptjs';
 import { Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import { log } from 'console';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject('USER_REPOSITORY')
     private readonly userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   async findAll() {
@@ -92,13 +94,14 @@ export class UserService {
     if (!currentUser) throw new NotFoundException('Invalid Email!');
     const comparePassword = await compare(body.password, currentUser.password);
     if (!comparePassword) throw new NotFoundException('Invalid Password!');
+    const jwt = this.configService.get('jwt');
     const token = sign(
       {
         email: currentUser.email,
         id: currentUser.id,
         username: currentUser.username,
       },
-      'jwt',
+      jwt,
       { expiresIn: '1d' },
     );
     return res
