@@ -7,8 +7,11 @@ import {
   Post,
   Put,
   Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ReplyService } from '../services/reply.service';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api')
 export class ReplyController {
@@ -30,20 +33,24 @@ export class ReplyController {
   }
 
   @Put('/update-reply/:tweetId')
+  @UseInterceptors(AnyFilesInterceptor())
   async updateReply(
     @Req() req: Request,
     @Param() params: { tweetId: number },
     @Body() body: any,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.replyService.updateById(req, body, params.tweetId);
+    return this.replyService.updateById(req, body, params.tweetId, files);
   }
 
   @Post('/create-reply/:tweetId')
+  @UseInterceptors(AnyFilesInterceptor())
   async create(
     @Req() req: Request,
     @Param() params: { tweetId: number },
     @Body() body: any,
+    @UploadedFiles() file: Express.Multer.File[],
   ) {
-    return this.replyService.createReply(req, body, params.tweetId);
+    return this.replyService.createReply(req, body, params.tweetId, file);
   }
 }

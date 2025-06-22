@@ -19,8 +19,15 @@ export class Reply {
   @Column({ type: 'text', nullable: true })
   content?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  media?: string;
+  @Column({
+    type: 'text',
+    nullable: true,
+    transformer: {
+      to: (value: string[]) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
+  media?: string[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -8,9 +8,12 @@ import {
   Put,
   Req,
   Res,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TweetService } from '../services/tweet.service';
 import { Response } from 'express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api')
 export class TweetController {
@@ -32,16 +35,23 @@ export class TweetController {
   }
 
   @Put('/update-tweet/:id')
+  @UseInterceptors(AnyFilesInterceptor())
   async updateById(
     @Param() param: { id: number },
     @Body() body,
     @Req() req: Request,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.tweetService.updateById(param.id, body, req);
+    return this.tweetService.updateById(param.id, body, req, files);
   }
 
   @Post('/create-tweet')
-  async create(@Req() req: Request, @Body() body) {
-    return this.tweetService.create(req, body);
+  @UseInterceptors(AnyFilesInterceptor())
+  async create(
+    @Req() req: Request,
+    @Body() body,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.tweetService.create(req, body, files);
   }
 }

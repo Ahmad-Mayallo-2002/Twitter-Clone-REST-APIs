@@ -7,9 +7,13 @@ import {
   Post,
   Put,
   Res,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { Response } from 'express';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api')
 export class UserController {
@@ -31,13 +35,19 @@ export class UserController {
   }
 
   @Put('/update-user/:id')
-  async updateById(@Param() param: { id: number }, @Body() body) {
-    return this.userService.updateById(param.id, body);
+  @UseInterceptors(AnyFilesInterceptor())
+  async updateById(
+    @Param() param: { id: number },
+    @Body() body,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.userService.updateById(param.id, body, files);
   }
 
   @Post('/sign-up')
-  async signUp(@Body() body) {
-    return this.userService.signUp(body);
+  @UseInterceptors(AnyFilesInterceptor())
+  async signUp(@Body() body, @UploadedFiles() files: Express.Multer.File[]) {
+    return this.userService.signUp(body, files);
   }
 
   @Post('/login')

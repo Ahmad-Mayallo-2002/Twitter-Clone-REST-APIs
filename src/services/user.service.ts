@@ -1,11 +1,18 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UploadedFile,
+  UploadedFiles,
+} from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcryptjs';
 import { Response } from 'express';
 import { sign } from 'jsonwebtoken';
-import { log } from 'console';
 import { ConfigService } from '@nestjs/config';
+import { CloudinaryService } from '../cloudinary.service';
+import { log } from 'console';
 
 @Injectable()
 export class UserService {
@@ -13,6 +20,7 @@ export class UserService {
     @Inject('USER_REPOSITORY')
     private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findAll() {
@@ -65,20 +73,34 @@ export class UserService {
     return { msg: 'User is Deleted!' };
   }
 
-  async updateById(id: number, body: User) {
+  async updateById(id: number, body: User, files: Express.Multer.File[]) {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('This User is not Found!');
+    if (files.length) {
+      const userFiles = await this.cloudinaryService.uploadFiles(files);
+      files.forEach(
+        (file, index) => (body[file.fieldname] = userFiles[index].url),
+      );
+    }
     await this.userRepository.update(id, body);
     return { msg: 'User is Updated!' };
   }
 
-  async signUp(body: User) {
+  async signUp(body: User, files: Express.Multer.File[]) {
     const currentUser = await this.userRepository.findOneBy({
       email: body.email,
     });
     const hashPassword = await hash(body.password, 10);
     if (currentUser)
       throw new NotFoundException('This Email is Already Exist!');
+    if (files.length) {
+      const userFiles = await this.cloudinaryService.uploadFiles(files);
+      files.forEach((file, index) => {
+        if (file) {
+          body[file.fieldname] = userFiles[index].url;
+        }
+      });
+    }
     const user = this.userRepository.create({
       ...body,
       password: hashPassword,

@@ -4,10 +4,11 @@ import { tweetProviders } from '../providers/tweet.providers';
 import { TweetService } from '../services/tweet.service';
 import { TweetController } from '../controllers/tweet.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { CloudinaryService } from '../cloudinary.service';
 
 @Module({
   imports: [DatabaseModule],
-  providers: [...tweetProviders, TweetService],
+  providers: [...tweetProviders, TweetService, CloudinaryService],
   controllers: [TweetController],
 })
 export class TweetModule implements NestModule {

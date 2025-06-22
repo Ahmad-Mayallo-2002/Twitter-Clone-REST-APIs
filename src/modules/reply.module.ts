@@ -6,6 +6,7 @@ import { ReplyController } from '../controllers/reply.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { userProviers } from '../providers/user.providers';
 import { tweetProviders } from '../providers/tweet.providers';
+import { CloudinaryService } from '../cloudinary.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -14,6 +15,7 @@ import { tweetProviders } from '../providers/tweet.providers';
     ReplyService,
     ...userProviers,
     ...tweetProviders,
+    CloudinaryService,
   ],
   controllers: [ReplyController],
 })

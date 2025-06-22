@@ -1,0 +1,22 @@
+{
+  "folders": [
+	{
+		"path": "."
+	}
+],
+  "settings": {
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "postgres",
+        "database": "demo",
+        "username": "postgres",
+        "password": "1234",
+        "connectionTimeout": 30
+      }
+    ]
+  }
+}

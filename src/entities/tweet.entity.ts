@@ -22,7 +22,13 @@ export class Tweet {
   @Column({ type: 'text', nullable: true })
   content?: string;
 
-  @Column('simple-array', { nullable: true })
+  @Column('text', {
+    nullable: true,
+    transformer: {
+      to: (value: string[]) => JSON.stringify(value),
+      from: (value: string) => JSON.parse(value),
+    },
+  })
   media?: string[];
 
   @CreateDateColumn()
@@ -38,10 +44,10 @@ export class Tweet {
   @OneToMany(() => Reply, (reply) => reply.tweet, { eager: true })
   reply: Relation<Reply[]>;
 
-  @OneToMany(() => Dislike, (like) => like.tweet, { eager: true })
+  @OneToMany(() => Dislike, (dislike) => dislike.tweet, { eager: true })
   like: Relation<Like[]>;
 
-  @OneToMany(() => Reply, (dislike) => dislike.tweet, { eager: true })
+  @OneToMany(() => Like, (like) => like.tweet, { eager: true })
   dislike: Relation<Dislike[]>;
   // End Relationships
 }
