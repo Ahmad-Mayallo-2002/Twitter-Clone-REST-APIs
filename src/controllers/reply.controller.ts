@@ -1,48 +1,49 @@
-import { Body, Controller, Param, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { ReplyService } from '../services/reply.service';
-import { Response } from 'express';
 
 @Controller('api')
 export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}
 
-  async getTweetReply(
-    @Res() res: Response,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.replyService.getTweetReply(res, params.tweetId);
+  @Get('/get-tweet-replies/:tweetId')
+  async getTweetReply(@Param() params: { tweetId: number }) {
+    return this.replyService.getTweetReply(params.tweetId);
   }
 
-  async getSinglReply(
-    @Res() res: Response,
-    @Param() params: { replyId: number },
-  ) {
-    return this.replyService.getSingleReply(res, params.replyId);
+  @Get('/get-single-reply/:replyId')
+  async getSinglReply(@Param() params: { replyId: number }) {
+    return this.replyService.getSingleReply(params.replyId);
   }
 
-  async deleteReply(
-    @Res() res: Response,
-    @Req() req: Request,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.replyService.deleteReply(req, res, params.tweetId);
+  @Delete('/delete-reply/:tweetId')
+  async deleteReply(@Req() req: Request, @Param() params: { tweetId: number }) {
+    return this.replyService.deleteReply(req, params.tweetId);
   }
 
+  @Put('/update-reply/:tweetId')
   async updateReply(
-    @Res() res: Response,
     @Req() req: Request,
     @Param() params: { tweetId: number },
     @Body() body: any,
   ) {
-    return this.replyService.updateById(req, res, body, params.tweetId);
+    return this.replyService.updateById(req, body, params.tweetId);
   }
 
+  @Post('/create-reply/:tweetId')
   async create(
-    @Res() res: Response,
     @Req() req: Request,
     @Param() params: { tweetId: number },
     @Body() body: any,
   ) {
-    return this.replyService.createReply(req, res, body, params.tweetId);
+    return this.replyService.createReply(req, body, params.tweetId);
   }
 }

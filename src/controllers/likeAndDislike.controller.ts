@@ -7,36 +7,22 @@ export class LikeAndDislikeController {
   constructor(private readonly likesAndDislikeService: LikeAndDislikeService) {}
 
   @Post('/add-like/:tweetId')
-  async addLike(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.likesAndDislikeService.addLike(req, res, params.tweetId);
+  async addLike(@Req() req: Request, @Param() params: { tweetId: number }) {
+    return this.likesAndDislikeService.addLike(req, params.tweetId);
   }
 
   @Post('/add-dislike/:tweetId')
-  async addDislike(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.likesAndDislikeService.addDislike(req, res, params.tweetId);
+  async addDislike(@Req() req: Request, @Param() params: { tweetId: number }) {
+    return this.likesAndDislikeService.addDislike(req, params.tweetId);
   }
 
   @Get('/get-tweet-likes/:tweetId')
-  async getTweetLikesCount(
-    @Res() res: Response,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.likesAndDislikeService.getTweetLikesCount(res, params.tweetId);
+  async getTweetLikesCount(@Param() params: { tweetId: number }) {
+    return this.likesAndDislikeService.getTweetLikesCount(params.tweetId);
   }
 
   @Get('/get-tweet-dislikes/:tweetId')
-  async getTweetDislikesCount(
-    @Res() res: Response,
-    @Param() params: { tweetId: number },
-  ) {
-    return this.likesAndDislikeService.getTweetLikesCount(res, params.tweetId);
+  async getTweetDislikesCount(@Param() params: { tweetId: number }) {
+    return this.likesAndDislikeService.getTweetDislikesCount(params.tweetId);
   }
 }

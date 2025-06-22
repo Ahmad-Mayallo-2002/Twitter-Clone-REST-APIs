@@ -6,9 +6,20 @@ import { TweetModule } from './modules/tweet.module';
 import { LikeModule } from './modules/likeAndDislike.module';
 import { ReplyModule } from './modules/reply.module';
 import { FollowModule } from './modules/follow.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, TweetModule, LikeModule, ReplyModule, FollowModule],
+  imports: [
+    UserModule,
+    TweetModule,
+    LikeModule,
+    ReplyModule,
+    FollowModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

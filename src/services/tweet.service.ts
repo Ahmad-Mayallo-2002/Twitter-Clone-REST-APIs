@@ -10,40 +10,80 @@ export class TweetService {
     private readonly tweetRepository: Repository<Tweet>,
   ) {}
 
-  async getAll(res: Response) {
-    const tweets = await this.tweetRepository.find();
+  async getAll() {
+    const tweets = await this.tweetRepository
+      .createQueryBuilder('tweet')
+      .leftJoinAndSelect('tweet.author', 'author')
+      .leftJoinAndSelect('tweet.reply', 'reply')
+      .leftJoinAndSelect('tweet.like', 'like')
+      .leftJoinAndSelect('tweet.dislike', 'dislike')
+      .orderBy('tweet.created_at', 'DESC')
+      .select([
+        'tweet.id',
+        'tweet.content',
+        'tweet.media',
+        'tweet.created_at',
+        'author.id',
+        'author.username',
+        'author.avatar',
+        'author.name',
+      ])
+      .getMany();
     if (!tweets.length) throw new NotFoundException('No Tweets!');
     return tweets;
   }
 
-  async getById(id: number, res: Response) {
-    const tweet = await this.tweetRepository.findOneBy({ id });
+  async getById(id: number) {
+    const tweet = await this.tweetRepository
+      .createQueryBuilder('tweet')
+      .leftJoinAndSelect('tweet.author', 'author')
+      .leftJoinAndSelect('tweet.reply', 'reply')
+      .leftJoinAndSelect('tweet.like', 'like')
+      .leftJoinAndSelect('tweet.dislike', 'dislike')
+      .where('tweet.id = :tweetId', { tweetId: id })
+      .orderBy('tweet.created_at', 'DESC')
+      .select([
+        'tweet.id',
+        'tweet.content',
+        'tweet.media',
+        'tweet.created_at',
+        'author.id',
+        'author.username',
+        'author.avatar',
+      ])
+      .getOne();
     if (!tweet) throw new NotFoundException('This Tweet is not Found!');
     return tweet;
   }
 
-  async deleteById(id: number, res: Response, req: Request) {
+  async deleteById(id: number, req: Request) {
     const tweet = await this.tweetRepository.findOneBy({
       id,
-      author: req.headers['id'],
+      author: { id: req.headers['id'] },
     });
     if (!tweet) throw new NotFoundException('This Tweet is not Found!');
-    await this.tweetRepository.delete({ id });
+    await this.tweetRepository.delete({
+      id,
+      author: { id: req.headers['id'] },
+    });
     return { msg: 'Tweet is Deleted!' };
   }
 
-  async updateById(id: number, res: Response, body, req: Request) {
+  async updateById(id: number, body, req: Request) {
     const tweet = await this.tweetRepository.findOneBy({
       id,
-      author: req.headers['id'],
+      author: { id: req.headers['id'] },
     });
     if (!tweet) throw new NotFoundException('This Tweet is not Found!');
     await this.tweetRepository.update({ id, author: req.headers['id'] }, body);
     return { msg: 'Tweet is Updated' };
   }
 
-  async create(res: Response, body) {
-    const tweet = this.tweetRepository.create(body);
+  async create(req: Request, body) {
+    const tweet = this.tweetRepository.create({
+      author: { id: req.headers['id'] },
+      ...body,
+    });
     await this.tweetRepository.save(tweet);
     return { msg: 'Tweet is Created!' };
   }

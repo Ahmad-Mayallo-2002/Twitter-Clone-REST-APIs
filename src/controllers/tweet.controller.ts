@@ -17,36 +17,31 @@ export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 
   @Get('/get-tweets')
-  async findAll(@Res() res: Response) {
-    return this.tweetService.getAll(res);
+  async findAll() {
+    return this.tweetService.getAll();
   }
 
   @Get('/get-tweets/:id')
-  async findById(@Res() res: Response, @Param() param: { id: number }) {
-    return this.tweetService.getById(param.id, res);
+  async findById(@Param() param: { id: number }) {
+    return this.tweetService.getById(param.id);
   }
 
   @Delete('/delete-tweet/:id')
-  async deleteById(
-    @Res() res: Response,
-    @Param() param: { id: number },
-    @Req() req: Request,
-  ) {
-    return this.tweetService.deleteById(param.id, res, req);
+  async deleteById(@Param() param: { id: number }, @Req() req: Request) {
+    return this.tweetService.deleteById(param.id, req);
   }
 
   @Put('/update-tweet/:id')
   async updateById(
-    @Res() res: Response,
     @Param() param: { id: number },
     @Body() body,
     @Req() req: Request,
   ) {
-    return this.tweetService.updateById(param.id, res, body, req);
+    return this.tweetService.updateById(param.id, body, req);
   }
 
   @Post('/create-tweet')
-  async create(@Res() res: Response, @Body() body) {
-    return this.tweetService.create(res, body);
+  async create(@Req() req: Request, @Body() body) {
+    return this.tweetService.create(req, body);
   }
 }

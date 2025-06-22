@@ -19,7 +19,7 @@ export class Reply {
   @Column({ type: 'text', nullable: true })
   content?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   media?: string;
 
   @CreateDateColumn()
@@ -29,7 +29,7 @@ export class Reply {
   updated_at: Date;
   // Start Relationships
   @ManyToOne(() => User, (user) => user.reply)
-  user: Relation<User>;
+  author: Relation<User>;
 
   @ManyToOne(() => Tweet, (tweet) => tweet.reply, { onDelete: 'CASCADE' })
   tweet: Relation<Tweet>;

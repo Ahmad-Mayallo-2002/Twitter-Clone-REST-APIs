@@ -13,58 +13,54 @@ export class LikeAndDislikeService {
     private readonly dislikeRepository: Repository<Dislike>,
   ) {}
 
-  async addLike(req: Request, res: Response, tweetId: number) {
-    const id = req.headers['id'];
-    const filterObject = { tweet: { id: tweetId }, user: { id } };
-    const currentLike = await this.likesRepository.findOneBy({
-      id: tweetId,
-      user: { id },
-    });
-    const currentDisLike = await this.dislikeRepository.findOneBy({
-      id: tweetId,
-      user: { id },
-    });
-    if (currentDisLike) await this.dislikeRepository.delete(filterObject);
+  async addLike(req: Request, tweetId: number) {
+    const userId = Number(req.headers['id']);
+    const filter = { tweet: { id: tweetId }, user: { id: userId } };
+
+    const currentLike = await this.likesRepository.findOneBy(filter);
+    const currentDislike = await this.dislikeRepository.findOneBy(filter);
+
+    if (currentDislike) await this.dislikeRepository.delete(filter);
+
     if (currentLike) {
-      await this.likesRepository.delete(filterObject);
+      await this.likesRepository.delete(filter);
       return { msg: 'Like is Removed!' };
     } else {
-      const like = this.likesRepository.create(filterObject);
+      const like = this.likesRepository.create(filter);
       await this.likesRepository.save(like);
       return { msg: 'Like is Added!' };
     }
   }
 
-  async addDislike(req: Request, res: Response, tweetId: number) {
-    const id = req.headers['id'];
-    const filterObject = { tweet: { id: tweetId }, user: { id } };
-    const currentLike = await this.likesRepository.findOneBy({
-      id: tweetId,
-      user: { id },
-    });
-    const currentDisLike = await this.dislikeRepository.findOneBy({
-      id: tweetId,
-      user: { id },
-    });
-    if (currentLike) await this.likesRepository.delete(filterObject);
-    if (currentDisLike) {
-      await this.dislikeRepository.delete(filterObject);
+  async addDislike(req: Request, tweetId: number) {
+    const userId = Number(req.headers['id']);
+    const filter = { tweet: { id: tweetId }, user: { id: userId } };
+
+    const currentLike = await this.likesRepository.findOneBy(filter);
+    const currentDislike = await this.dislikeRepository.findOneBy(filter);
+
+    if (currentLike) await this.likesRepository.delete(filter);
+
+    if (currentDislike) {
+      await this.dislikeRepository.delete(filter);
       return { msg: 'Dislike is Removed!' };
     } else {
-      const dislike = this.dislikeRepository.create(filterObject);
+      const dislike = this.dislikeRepository.create(filter);
       await this.dislikeRepository.save(dislike);
       return { msg: 'Dislike is Added!' };
     }
   }
 
-  async getTweetLikesCount(res: Response, tweetId: number) {
-    const likes = await this.likesRepository.findBy({ tweet: { id: tweetId } });
+  async getTweetLikesCount(tweetId: number) {
+    const likes = await this.likesRepository.count({
+      where: { tweet: { id: tweetId } },
+    });
     return { likes };
   }
 
-  async getTweetDislikesCount(res: Response, tweetId: number) {
-    const dislikes = await this.dislikeRepository.findBy({
-      tweet: { id: tweetId },
+  async getTweetDislikesCount(tweetId: number) {
+    const dislikes = await this.dislikeRepository.count({
+      where: { tweet: { id: tweetId } },
     });
     return { dislikes };
   }

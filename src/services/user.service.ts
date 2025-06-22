@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import { compare } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import { log } from 'console';
@@ -13,39 +13,74 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(res: Response) {
-    const users = await this.userRepository.find();
+  async findAll() {
+    const users = await this.userRepository
+      .createQueryBuilder('users')
+      .select([
+        'users.id',
+        'users.username',
+        'users.name',
+        'users.email',
+        'users.bio',
+        'users.location',
+        'users.avatar',
+        'users.cover',
+        'users.created_at',
+        'users.updated_at',
+      ])
+      .orderBy('users.created_at', 'DESC')
+      .getMany();
     if (!users.length) throw new NotFoundException('No Users Here!');
     return users;
   }
 
-  async findById(id: number, res: Response) {
-    const user = await this.userRepository.findOneBy({ id });
+  async findById(id: number) {
+    const user = await this.userRepository
+      .createQueryBuilder('users')
+      .select([
+        'users.id',
+        'users.username',
+        'users.name',
+        'users.email',
+        'users.bio',
+        'users.location',
+        'users.avatar',
+        'users.cover',
+        'users.created_at',
+        'users.updated_at',
+      ])
+      .where('id = :id', { id })
+      .orderBy('users.created_at', 'DESC')
+      .getMany();
     if (!user) throw new NotFoundException('User is not Exist!');
     return user;
   }
 
-  async deleteById(id: number, res: Response) {
+  async deleteById(id: number) {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('This User is not Found!');
     await this.userRepository.delete({ id });
-    return res.status(200).json({ msg: 'User is Deleted!' });
+    return { msg: 'User is Deleted!' };
   }
 
-  async updateById(id: number, body: User, res: Response) {
+  async updateById(id: number, body: User) {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('This User is not Found!');
     await this.userRepository.update(id, body);
     return { msg: 'User is Updated!' };
   }
 
-  async signUp(body: User, res: Response) {
+  async signUp(body: User) {
     const currentUser = await this.userRepository.findOneBy({
       email: body.email,
     });
+    const hashPassword = await hash(body.password, 10);
     if (currentUser)
-      return res.status(404).json({ msg: 'This Email is Already Exist!' });
-    const user = this.userRepository.create(body);
+      throw new NotFoundException('This Email is Already Exist!');
+    const user = this.userRepository.create({
+      ...body,
+      password: hashPassword,
+    });
     await this.userRepository.save(user);
     return { msg: 'Signup is Done!' };
   }

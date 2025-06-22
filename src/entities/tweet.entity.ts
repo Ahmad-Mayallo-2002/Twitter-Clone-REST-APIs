@@ -22,7 +22,7 @@ export class Tweet {
   @Column({ type: 'text', nullable: true })
   content?: string;
 
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   media?: string[];
 
   @CreateDateColumn()
@@ -31,17 +31,17 @@ export class Tweet {
   @UpdateDateColumn()
   updated_at: Date;
   // Start Relationships
-  @ManyToOne((type) => User, (user) => user.tweets)
+  @ManyToOne(() => User, (user) => user.tweets)
   @JoinColumn()
   author: Relation<User>;
 
-  @OneToMany((type) => Reply, (reply) => reply.tweet, { cascade: true })
-  reply: Relation<Reply>[];
+  @OneToMany(() => Reply, (reply) => reply.tweet, { eager: true })
+  reply: Relation<Reply[]>;
 
-  @OneToMany((type) => Dislike, (like) => like.tweet, { eager: true })
-  like: Relation<Like>[];
+  @OneToMany(() => Dislike, (like) => like.tweet, { eager: true })
+  like: Relation<Like[]>;
 
-  @OneToMany((type) => Reply, (dislike) => dislike.tweet, { eager: true })
-  dislike: Relation<Dislike>[];
+  @OneToMany(() => Reply, (dislike) => dislike.tweet, { eager: true })
+  dislike: Relation<Dislike[]>;
   // End Relationships
 }

@@ -1,7 +1,4 @@
-import { hash, hashSync } from 'bcryptjs';
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -16,7 +13,6 @@ import { Like } from './like.entity';
 import { Dislike } from './dislikes.entity';
 import { IsDate, IsEmail, IsEmpty, Length } from 'class-validator';
 import { Follow } from './follow.entity';
-import { log } from 'console';
 
 @Entity({ name: 'users' })
 export class User {
@@ -74,29 +70,21 @@ export class User {
 
   // Start Relationships
   @OneToMany((type) => Tweet, (tweets) => tweets.author, { eager: true })
-  tweets: Relation<Tweet>[];
+  tweets: Relation<Tweet[]>;
 
   @OneToMany((type) => Like, (like) => like.tweet, { eager: true })
-  like: Relation<Like>[];
+  like: Relation<Like[]>;
 
   @OneToMany((type) => Reply, (dislike) => dislike.tweet, { eager: true })
-  dislike: Relation<Dislike>[];
+  dislike: Relation<Dislike[]>;
 
-  @OneToMany((type) => Reply, (reply) => reply.user, { eager: true })
-  reply: Relation<Reply>[];
-
-  @OneToMany(() => Follow, (follow) => follow.followings)
-  followings: Relation<Follow>[];
+  @OneToMany((type) => Reply, (reply) => reply.author, { eager: true })
+  reply: Relation<Reply[]>;
 
   @OneToMany(() => Follow, (follow) => follow.follower)
-  follower: Relation<Follow>[];
+  followings: Relation<Follow[]>;
+
+  @OneToMany(() => Follow, (follow) => follow.followings)
+  follower: Relation<Follow[]>;
   // End Relationships
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    this.password = await hash(this.password, 10);
-  }
 }
-
-log('123456789', hashSync('123456789', 10));
