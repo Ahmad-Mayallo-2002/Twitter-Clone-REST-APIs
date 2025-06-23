@@ -7,13 +7,13 @@ import {
   Post,
   Put,
   Req,
-  Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { TweetService } from '../services/tweet.service';
-import { Response } from 'express';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('api')
 export class TweetController {
@@ -29,11 +29,13 @@ export class TweetController {
     return this.tweetService.getById(param.id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('/delete-tweet/:id')
   async deleteById(@Param() param: { id: number }, @Req() req: Request) {
     return this.tweetService.deleteById(param.id, req);
   }
 
+  @UseGuards(AuthGuard)
   @Put('/update-tweet/:id')
   @UseInterceptors(AnyFilesInterceptor())
   async updateById(
@@ -45,6 +47,7 @@ export class TweetController {
     return this.tweetService.updateById(param.id, body, req, files);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/create-tweet')
   @UseInterceptors(AnyFilesInterceptor())
   async create(

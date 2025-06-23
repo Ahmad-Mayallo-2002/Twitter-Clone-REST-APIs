@@ -1,16 +1,18 @@
-import { Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { LikeAndDislikeService } from '../services/likeAndDislike.service';
-import { Response } from 'express';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('api')
 export class LikeAndDislikeController {
   constructor(private readonly likesAndDislikeService: LikeAndDislikeService) {}
 
+  @UseGuards(AuthGuard)
   @Post('/add-like/:tweetId')
   async addLike(@Req() req: Request, @Param() params: { tweetId: number }) {
     return this.likesAndDislikeService.addLike(req, params.tweetId);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/add-dislike/:tweetId')
   async addDislike(@Req() req: Request, @Param() params: { tweetId: number }) {
     return this.likesAndDislikeService.addDislike(req, params.tweetId);

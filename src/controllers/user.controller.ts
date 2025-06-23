@@ -7,13 +7,14 @@ import {
   Post,
   Put,
   Res,
-  UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { Response } from 'express';
 import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('/api')
 export class UserController {
@@ -29,11 +30,13 @@ export class UserController {
     return this.userService.findById(param.id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('/delete-user/:id')
   async deleteById(@Param() param: { id: number }) {
     return this.userService.deleteById(param.id);
   }
 
+  @UseGuards(AuthGuard)
   @Put('/update-user/:id')
   @UseInterceptors(AnyFilesInterceptor())
   async updateById(

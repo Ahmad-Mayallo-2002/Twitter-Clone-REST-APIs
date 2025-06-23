@@ -8,10 +8,12 @@ import {
   Put,
   Req,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ReplyService } from '../services/reply.service';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('api')
 export class ReplyController {
@@ -27,11 +29,13 @@ export class ReplyController {
     return this.replyService.getSingleReply(params.replyId);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('/delete-reply/:tweetId')
   async deleteReply(@Req() req: Request, @Param() params: { tweetId: number }) {
     return this.replyService.deleteReply(req, params.tweetId);
   }
 
+  @UseGuards(AuthGuard)
   @Put('/update-reply/:tweetId')
   @UseInterceptors(AnyFilesInterceptor())
   async updateReply(
@@ -43,6 +47,7 @@ export class ReplyController {
     return this.replyService.updateById(req, body, params.tweetId, files);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/create-reply/:tweetId')
   @UseInterceptors(AnyFilesInterceptor())
   async create(

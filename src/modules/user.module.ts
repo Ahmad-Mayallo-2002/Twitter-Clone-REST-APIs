@@ -11,10 +11,4 @@ import { CloudinaryService } from '../cloudinary.service';
   providers: [...userProviers, UserService, CloudinaryService],
   controllers: [UserController],
 })
-export class UserModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes('/delete-user/:id', '/update-user/:id');
-  }
-}
+export class UserModule {}
