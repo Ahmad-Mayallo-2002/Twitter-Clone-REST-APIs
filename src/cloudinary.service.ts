@@ -6,9 +6,9 @@ import { Readable } from 'stream';
 export class CloudinaryService {
   constructor() {
     cloudinary.config({
-      cloud_name: 'dc33cfvep',
-      api_key: '337251369924148',
-      api_secret: 'nYLUBjLVtwBYascK9m8fFdhRGDo',
+      cloud_name: process.env.CLOUDINARY_API_KEY,
+      api_key: process.env.CLOUDINARY_API_SECRET,
+      api_secret: process.env.CLOUDINARY_NAME,
     });
   }
 
